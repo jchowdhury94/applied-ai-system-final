@@ -92,7 +92,7 @@ class Task:
 
     def mark_complete(self):
         """Mark this task as completed, record the completion date, and return a
-        new Task for the next occurrence if this task recurs (daily/weekly),
+        new Task for the next occurrence if this task recurs (daily/weekly/monthly),
         or None if it does not recur."""
         self.completed = True
         self.last_completed = date.today()
@@ -101,6 +101,8 @@ class Task:
             next_due_date = self.due_date + timedelta(days=1)
         elif self.frequency == "weekly":
             next_due_date = self.due_date + timedelta(days=7)
+        elif self.frequency == "monthly":
+            next_due_date = self.due_date + timedelta(days=FREQUENCY_INTERVAL_DAYS["monthly"])
         else:
             return None
 

@@ -40,6 +40,24 @@ def test_complete_task_creates_next_day_occurrence_for_daily_task():
     assert new_task.due_date == date.today() + timedelta(days=1)
 
 
+def test_complete_task_creates_next_month_occurrence_for_monthly_task():
+    pet = Pet("Whiskers", "cat", 3, "low-maintenance")
+    task = Task("Give heartworm medication", "08:00", "monthly", due_date=date.today())
+    pet.add_task(task)
+
+    pet.complete_task("Give heartworm medication")
+
+    tasks = pet.get_tasks()
+    assert len(tasks) == 2
+
+    original_task = next(t for t in tasks if t is task)
+    new_task = next(t for t in tasks if t is not task)
+
+    assert original_task.completed is True
+    assert new_task.completed is False
+    assert new_task.due_date == date.today() + timedelta(days=30)
+
+
 def test_generate_plan_orders_tasks_chronologically():
     owner = Owner(available_time="1 hour", preferred_times=["morning"], task_priorities=[])
     pet = Pet("Whiskers", "cat", 3, "low-maintenance")
