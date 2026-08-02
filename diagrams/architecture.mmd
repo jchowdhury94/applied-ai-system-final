@@ -1,0 +1,69 @@
+%% PawPal+ AI Assistant - implemented architecture
+%% Reflects the actual code in app.py, ai_assistant.py, retrieval.py,
+%% pawpal_system.py, validators.py, logger_config.py, and tests/.
+flowchart TD
+
+    User(["User"])
+    UI["Streamlit UI\napp.py"]
+    Assistant["AI Assistant\nai_assistant.answer_question()"]
+    Retrieval["Retrieval\nretrieval.retrieve_context()\n(deterministic intent/pet detection)"]
+
+    subgraph Backend["PawPal Backend (pawpal_system.py)"]
+        direction LR
+        Owner["Owner"]
+        Pet["Pet"]
+        Task["Task"]
+        Scheduler["Scheduler"]
+    end
+
+    ContextBuilder["Context Builder\nai_assistant._build_user_prompt()\n(grounded prompt: question + intent + retrieved records)"]
+    Claude["Claude API\nclient.messages.create()"]
+    Validators["Validators\nvalidators.validate_answer()\n(keyword/regex guardrails, confidence score)"]
+    Fallback["Deterministic Fallback\nvalidators.format_fallback_answer()\n(built straight from retrieved records, no LLM)"]
+    FinalAnswer["Final Answer\n(rendered in Streamlit)"]
+
+    Logger["logger_config.py\nshared 'pawpal_ai' logger\n(console + logs/pawpal_ai.log)"]
+    Tests["Automated pytest tests\ntests/test_*.py\n(offline, dev-time, no live Claude calls)"]
+    HumanEval["Human Evaluation\ndeveloper/user reads Answer + Validation\nconfidence + fallback reason + retrieved\ncontext expander in the Streamlit UI"]
+
+    %% Main success path
+    User --> UI
+    UI --> Assistant
+    Assistant --> Retrieval
+    Retrieval <--> Backend
+    Retrieval -- "retrieval_result\n(records, context_text)" --> Assistant
+    Assistant --> ContextBuilder
+    ContextBuilder --> Claude
+    Claude -- "Claude answer" --> Validators
+    Validators -- "valid" --> FinalAnswer
+    FinalAnswer --> UI
+    UI --> User
+
+    %% Deterministic fallback path
+    Retrieval -. "unsupported question /\nno matching data" .-> Fallback
+    Claude -. "missing API key /\nAPI call failed /\nempty or unreadable response" .-> Fallback
+    Validators -. "validation failed" .-> Fallback
+    Fallback --> FinalAnswer
+
+    %% Logging observes each pipeline stage
+    Retrieval -. logs .-> Logger
+    Assistant -. "logs Claude request/response" .-> Logger
+    Validators -. logs .-> Logger
+    Fallback -. logs .-> Logger
+
+    %% Quality assurance (outside the runtime request path)
+    Tests -. "exercise" .-> Retrieval
+    Tests -. "exercise" .-> Validators
+    Tests -. "exercise" .-> Assistant
+    Tests -. "exercise" .-> Backend
+    Tests -. "exercise" .-> Logger
+
+    FinalAnswer -. "read by" .-> HumanEval
+
+    classDef fallback fill:#5c2b29,stroke:#e0554f,color:#fff;
+    classDef support fill:#2b3a5c,stroke:#5a7bd8,color:#fff;
+    classDef backend fill:#2b4a3a,stroke:#4fae7a,color:#fff;
+
+    class Fallback fallback;
+    class Logger,Tests,HumanEval support;
+    class Owner,Pet,Task,Scheduler backend;
