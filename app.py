@@ -1,5 +1,45 @@
+from datetime import date
+
 import streamlit as st
+
+import ai_assistant
 from pawpal_system import Owner, Pet, Task, Scheduler
+
+
+def _render_ai_result(result):
+    """Render one ai_assistant.answer_question() result dict in the UI.
+
+    Only reads from `result` - never touches session state or PawPal+ objects,
+    so it cannot be used to add, delete, complete, or reschedule anything.
+    """
+    st.markdown(f"**Answer:** {result.get('answer') or '(no answer available)'}")
+
+    st.caption(f"Detected intent: {result.get('intent') or 'none'}")
+    if result.get("detected_pet"):
+        st.caption(f"Detected pet: {result['detected_pet']}")
+
+    if result.get("fallback_used"):
+        st.info(
+            "PawPal+ used a deterministic answer based directly on retrieved "
+            "records instead of an AI-generated answer "
+            f"(reason: {result.get('fallback_reason') or 'unknown'})."
+        )
+
+    validation_result = result.get("validation_result")
+    if validation_result:
+        st.caption(f"Validation confidence: {validation_result.get('confidence')}")
+
+    retrieval_result = result.get("retrieval_result")
+    with st.expander("Retrieved PawPal+ Context"):
+        st.caption("This is the information PawPal+ AI used to ground its answer.")
+        if retrieval_result:
+            st.text(retrieval_result.get("context_text") or "No context available.")
+            st.caption(f"Records retrieved: {len(retrieval_result.get('records') or [])}")
+            st.caption(f"Detected intent: {retrieval_result.get('intent') or 'none'}")
+            if retrieval_result.get("detected_pet"):
+                st.caption(f"Detected pet: {retrieval_result['detected_pet']}")
+        else:
+            st.caption("No context was retrieved for this question.")
 
 st.set_page_config(page_title="PawPal+", page_icon="🐾", layout="centered")
 
@@ -132,3 +172,39 @@ if st.button("Generate schedule"):
                 for t in tasks
             )
             st.warning(f"Conflict at {tasks[0].time}: {details}.")
+
+st.divider()
+
+st.subheader("Ask PawPal+ AI")
+st.markdown(
+    "This assistant answers questions using the pets and tasks currently "
+    "stored in this Streamlit session (`st.session_state.owner`). It is "
+    "**read-only** - it cannot add, delete, complete, or reschedule anything."
+)
+st.caption(
+    "PawPal+ AI does not provide veterinary diagnosis or treatment advice."
+)
+with st.expander("Example questions you can ask"):
+    st.markdown(
+        """
+- What tasks are incomplete?
+- What tasks are completed?
+- What tasks does Mochi have?
+- What is today's schedule?
+- Are there any scheduling conflicts?
+- What task should I do next?
+"""
+    )
+
+ai_question = st.text_input("Ask a question about your pets and tasks", key="ai_question")
+
+if st.button("Ask PawPal+ AI"):
+    if not ai_question or not ai_question.strip():
+        st.warning("Please enter a question before submitting.")
+    else:
+        st.session_state.last_ai_result = ai_assistant.answer_question(
+            ai_question, owner, reference_date=date.today()
+        )
+
+if "last_ai_result" in st.session_state:
+    _render_ai_result(st.session_state.last_ai_result)
