@@ -47,6 +47,12 @@ def detect_intent(question):
     if "schedule" in normalized:
         return INTENT_TODAYS_SCHEDULE
 
+    if "incomplete" in normalized:
+        return INTENT_INCOMPLETE_TASKS
+
+    if "next" in normalized:
+        return INTENT_NEXT_TASK
+
     if "task" in normalized:
         return INTENT_PET_TASKS
 
