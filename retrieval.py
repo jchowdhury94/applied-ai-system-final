@@ -9,7 +9,10 @@ nothing in this module ever mutates Owner/Pet/Task/Scheduler state.
 
 from datetime import date
 
+from logger_config import get_logger
 from pawpal_system import Scheduler, _safe_parse_time, _time_sort_key
+
+logger = get_logger(__name__)
 
 INTENT_INCOMPLETE_TASKS = "incomplete_tasks"
 INTENT_COMPLETED_TASKS = "completed_tasks"
@@ -107,6 +110,21 @@ def retrieve_context(question, owner, reference_date=None):
     """Validate a question, detect intent/pet, retrieve matching PawPal+ records,
     and return a structured result with a compact text context. Never mutates
     Owner, Pet, Task, or Scheduler state."""
+    logger.info("Retrieval started.")
+    try:
+        result = _retrieve_context(question, owner, reference_date)
+    except Exception as exc:
+        logger.error("Unexpected retrieval error (%s).", type(exc).__name__)
+        raise
+
+    record_count = len(result.get("records") or [])
+    if result.get("supported") and record_count == 0:
+        logger.info("No matching records were found.")
+    logger.info("Retrieval completed with %d record(s).", record_count)
+    return result
+
+
+def _retrieve_context(question, owner, reference_date):
     if reference_date is None:
         reference_date = date.today()
 
@@ -121,14 +139,17 @@ def retrieve_context(question, owner, reference_date=None):
     }
 
     if question is None or not question.strip():
+        logger.info("Blank question received.")
         result["message"] = "The question was blank."
         result["context_text"] = "No question was provided."
         return result
 
     intent = detect_intent(question)
     result["intent"] = intent
+    logger.info("Detected intent: %s", intent)
 
     if intent == INTENT_UNSUPPORTED:
+        logger.info("Unsupported question; no supported intent detected.")
         result["message"] = "This question is not one of the supported PawPal+ question types."
         result["context_text"] = "No supported intent was detected for this question."
         return result
@@ -141,6 +162,8 @@ def retrieve_context(question, owner, reference_date=None):
         return result
 
     detected_pet = detect_pet(question, owner)
+    if detected_pet:
+        logger.info("Detected pet: %s", detected_pet)
     if intent == INTENT_PET_TASKS:
         result["detected_pet"] = detected_pet
         if detected_pet is None:

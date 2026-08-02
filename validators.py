@@ -16,6 +16,7 @@ Nothing in this module mutates the retrieval result or any PawPal+ objects.
 import re
 import string
 
+from logger_config import get_logger
 from retrieval import (
     INTENT_INCOMPLETE_TASKS,
     INTENT_COMPLETED_TASKS,
@@ -25,6 +26,8 @@ from retrieval import (
     INTENT_NEXT_TASK,
     INTENT_UNSUPPORTED,
 )
+
+logger = get_logger(__name__)
 
 # ---------------------------------------------------------------------------
 # Part 1: Deterministic fallback
@@ -39,6 +42,8 @@ def format_fallback_answer(retrieval_result):
     """
     intent = retrieval_result.get("intent")
     records = retrieval_result.get("records", [])
+
+    logger.info("Fallback answer generated. fallback_intent=%s", intent)
 
     if intent == INTENT_INCOMPLETE_TASKS:
         return _format_incomplete_tasks(records)
@@ -198,6 +203,7 @@ def validate_answer(answer, retrieval_result):
     Uses deterministic keyword/regex rules only - no LLM calls, no complex
     natural-language understanding.
     """
+    logger.info("Validation started.")
     issues = []
 
     if answer is None or not answer.strip():
@@ -258,6 +264,14 @@ def validate_answer(answer, retrieval_result):
 def _build_validation_result(issues):
     confidence = max(0.0, 1.0 - _ISSUE_DEDUCTION * len(issues))
     valid = len(issues) == 0
+
+    if valid:
+        logger.info("Validation passed. issue_count=0 confidence=%.2f", confidence)
+    else:
+        logger.info(
+            "Validation failed. issue_count=%d confidence=%.2f", len(issues), confidence
+        )
+
     return {
         "valid": valid,
         "issues": issues,
