@@ -1,6 +1,6 @@
 # PawPal+ AI Assistant — Execution Evidence
 
-This document collects raw, pasted evidence that the PawPal+ AI assistant was actually run and tested, to accompany the results recorded in `evaluation_results.md`. Every code block below is a placeholder — replace each one with real, unedited output. Do not fabricate or reconstruct output from memory.
+This document collects raw, pasted evidence that the PawPal+ AI assistant was actually run and tested, to accompany the results recorded in `evaluation_results.md`. Every code block below is real, unedited output captured from this repository. Do not fabricate or reconstruct output from memory.
 
 ## 1. Environment Information
 
@@ -68,13 +68,200 @@ websockets==16.1.1
 
 ## 2. Dependency Installation
 
-```text
-[PASTE FULL TERMINAL OUTPUT OF:
-  python3 -m venv .venv
-  source .venv/bin/activate
-  pip install -r requirements.txt
-]
+Captured in a clean, temporary virtual environment (`.venv-evidence`), separate from the project's regular `.venv`, using:
+
+```bash
+python3 -m venv .venv-evidence
+source .venv-evidence/bin/activate
+python3 -m pip install --upgrade pip
+pip install -r requirements.txt
+deactivate
+rm -rf .venv-evidence
 ```
+
+```text
+Requirement already satisfied: pip in ./.venv-evidence/lib/python3.13/site-packages (25.2)
+Collecting pip
+  Using cached pip-26.2-py3-none-any.whl.metadata (4.6 kB)
+Using cached pip-26.2-py3-none-any.whl (1.8 MB)
+Installing collected packages: pip
+  Attempting uninstall: pip
+    Found existing installation: pip 25.2
+    Uninstalling pip-25.2:
+      Successfully uninstalled pip-25.2
+Successfully installed pip-26.2
+---SEPARATOR---
+Collecting streamlit>=1.30 (from -r requirements.txt (line 1))
+  Using cached streamlit-1.60.0-py3-none-any.whl.metadata (10 kB)
+Collecting pytest>=7.0 (from -r requirements.txt (line 2))
+  Using cached pytest-9.1.1-py3-none-any.whl.metadata (7.6 kB)
+Collecting anthropic>=0.40.0 (from -r requirements.txt (line 3))
+  Using cached anthropic-0.120.2-py3-none-any.whl.metadata (3.3 kB)
+Collecting altair!=5.4.0,!=5.4.1,<7,>=4.0 (from streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached altair-6.2.2-py3-none-any.whl.metadata (11 kB)
+Collecting blinker<2,>=1.5.0 (from streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached blinker-1.9.0-py3-none-any.whl.metadata (1.6 kB)
+Collecting click<9,>=7.0 (from streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached click-8.4.2-py3-none-any.whl.metadata (2.6 kB)
+Collecting gitpython!=3.1.19,<4,>=3.0.7 (from streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached gitpython-3.1.57-py3-none-any.whl.metadata (13 kB)
+Collecting numpy<3,>=1.23 (from streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached numpy-2.5.1-cp313-cp313-macosx_14_0_arm64.whl.metadata (6.6 kB)
+Collecting packaging>=20 (from streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached packaging-26.2-py3-none-any.whl.metadata (3.5 kB)
+Collecting pandas<4,>=1.4.0 (from streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached pandas-3.0.5-cp313-cp313-macosx_11_0_arm64.whl.metadata (79 kB)
+Collecting pillow<13,>=7.1.0 (from streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached pillow-12.3.0-cp313-cp313-macosx_11_0_arm64.whl.metadata (9.1 kB)
+Collecting pydeck<1,>=0.8.0b4 (from streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached pydeck-0.9.3-py2.py3-none-any.whl.metadata (4.2 kB)
+Collecting protobuf<8,>=3.20 (from streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached protobuf-7.35.1-cp310-abi3-macosx_10_9_universal2.whl.metadata (595 bytes)
+Collecting pyarrow<25,>=7.0 (from streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached pyarrow-24.0.0-cp313-cp313-macosx_12_0_arm64.whl.metadata (3.0 kB)
+Collecting requests<3,>=2.27 (from streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+Collecting tenacity<10,>=8.1.0 (from streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached tenacity-9.1.4-py3-none-any.whl.metadata (1.2 kB)
+Collecting toml<2,>=0.10.1 (from streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached toml-0.10.2-py2.py3-none-any.whl.metadata (7.1 kB)
+Collecting typing-extensions<5,>=4.10.0 (from streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting starlette<2,>=0.40.0 (from streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached starlette-1.3.1-py3-none-any.whl.metadata (6.4 kB)
+Collecting uvicorn<1,>=0.30.0 (from streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached uvicorn-0.52.1-py3-none-any.whl.metadata (6.6 kB)
+Collecting httptools<1,>=0.6.3 (from streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached httptools-0.8.0-cp313-cp313-macosx_11_0_arm64.whl.metadata (3.5 kB)
+Collecting anyio<5,>=4.0.0 (from streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached anyio-4.14.2-py3-none-any.whl.metadata (4.6 kB)
+Collecting python-multipart<1,>=0.0.10 (from streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached python_multipart-0.0.32-py3-none-any.whl.metadata (2.1 kB)
+Collecting websockets<17,>=12.0.0 (from streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached websockets-16.1.1-cp313-cp313-macosx_11_0_arm64.whl.metadata (6.8 kB)
+Collecting itsdangerous<3,>=2.1.2 (from streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached itsdangerous-2.2.0-py3-none-any.whl.metadata (1.9 kB)
+Collecting jinja2 (from altair!=5.4.0,!=5.4.1,<7,>=4.0->streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+Collecting jsonschema>=3.0 (from altair!=5.4.0,!=5.4.1,<7,>=4.0->streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached jsonschema-4.26.0-py3-none-any.whl.metadata (7.6 kB)
+Collecting narwhals>=2.4.0 (from altair!=5.4.0,!=5.4.1,<7,>=4.0->streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached narwhals-2.24.0-py3-none-any.whl.metadata (15 kB)
+Collecting idna>=2.8 (from anyio<5,>=4.0.0->streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached idna-3.18-py3-none-any.whl.metadata (6.1 kB)
+Collecting gitdb<5,>=4.0.1 (from gitpython!=3.1.19,<4,>=3.0.7->streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached gitdb-4.0.12-py3-none-any.whl.metadata (1.2 kB)
+Collecting smmap<6,>=3.0.1 (from gitdb<5,>=4.0.1->gitpython!=3.1.19,<4,>=3.0.7->streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached smmap-5.0.3-py3-none-any.whl.metadata (4.6 kB)
+Collecting python-dateutil>=2.8.2 (from pandas<4,>=1.4.0->streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+Collecting charset_normalizer<4,>=2 (from requests<3,>=2.27->streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached charset_normalizer-3.4.9-cp313-cp313-macosx_10_13_universal2.whl.metadata (41 kB)
+Collecting urllib3<3,>=1.26 (from requests<3,>=2.27->streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached urllib3-2.7.0-py3-none-any.whl.metadata (6.9 kB)
+Collecting certifi>=2023.5.7 (from requests<3,>=2.27->streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached certifi-2026.7.22-py3-none-any.whl.metadata (2.5 kB)
+Collecting h11>=0.8 (from uvicorn<1,>=0.30.0->streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+Collecting iniconfig>=1.0.1 (from pytest>=7.0->-r requirements.txt (line 2))
+  Using cached iniconfig-2.3.0-py3-none-any.whl.metadata (2.5 kB)
+Collecting pluggy<2,>=1.5 (from pytest>=7.0->-r requirements.txt (line 2))
+  Using cached pluggy-1.6.0-py3-none-any.whl.metadata (4.8 kB)
+Collecting pygments>=2.7.2 (from pytest>=7.0->-r requirements.txt (line 2))
+  Using cached pygments-2.20.0-py3-none-any.whl.metadata (2.5 kB)
+Collecting distro<2,>=1.7.0 (from anthropic>=0.40.0->-r requirements.txt (line 3))
+  Using cached distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)
+Collecting docstring-parser<1,>=0.15 (from anthropic>=0.40.0->-r requirements.txt (line 3))
+  Using cached docstring_parser-0.18.0-py3-none-any.whl.metadata (3.5 kB)
+Collecting httpx<1,>=0.25.0 (from anthropic>=0.40.0->-r requirements.txt (line 3))
+  Using cached httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+Collecting jiter<1,>=0.4.0 (from anthropic>=0.40.0->-r requirements.txt (line 3))
+  Using cached jiter-0.16.0-cp313-cp313-macosx_11_0_arm64.whl.metadata (5.2 kB)
+Collecting pydantic<3,>=1.9.0 (from anthropic>=0.40.0->-r requirements.txt (line 3))
+  Using cached pydantic-2.13.4-py3-none-any.whl.metadata (109 kB)
+Collecting sniffio (from anthropic>=0.40.0->-r requirements.txt (line 3))
+  Using cached sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+Collecting httpcore==1.* (from httpx<1,>=0.25.0->anthropic>=0.40.0->-r requirements.txt (line 3))
+  Using cached httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+Collecting annotated-types>=0.6.0 (from pydantic<3,>=1.9.0->anthropic>=0.40.0->-r requirements.txt (line 3))
+  Using cached annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+Collecting pydantic-core==2.46.4 (from pydantic<3,>=1.9.0->anthropic>=0.40.0->-r requirements.txt (line 3))
+  Using cached pydantic_core-2.46.4-cp313-cp313-macosx_11_0_arm64.whl.metadata (6.6 kB)
+Collecting typing-inspection>=0.4.2 (from pydantic<3,>=1.9.0->anthropic>=0.40.0->-r requirements.txt (line 3))
+  Using cached typing_inspection-0.4.2-py3-none-any.whl.metadata (2.6 kB)
+Collecting MarkupSafe>=2.0 (from jinja2->altair!=5.4.0,!=5.4.1,<7,>=4.0->streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached markupsafe-3.0.3-cp313-cp313-macosx_11_0_arm64.whl.metadata (2.7 kB)
+Collecting attrs>=22.2.0 (from jsonschema>=3.0->altair!=5.4.0,!=5.4.1,<7,>=4.0->streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+Collecting jsonschema-specifications>=2023.03.6 (from jsonschema>=3.0->altair!=5.4.0,!=5.4.1,<7,>=4.0->streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached jsonschema_specifications-2025.9.1-py3-none-any.whl.metadata (2.9 kB)
+Collecting referencing>=0.28.4 (from jsonschema>=3.0->altair!=5.4.0,!=5.4.1,<7,>=4.0->streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached referencing-0.37.0-py3-none-any.whl.metadata (2.8 kB)
+Collecting rpds-py>=0.25.0 (from jsonschema>=3.0->altair!=5.4.0,!=5.4.1,<7,>=4.0->streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached rpds_py-2026.6.3-cp313-cp313-macosx_11_0_arm64.whl.metadata (4.1 kB)
+Collecting six>=1.5 (from python-dateutil>=2.8.2->pandas<4,>=1.4.0->streamlit>=1.30->-r requirements.txt (line 1))
+  Using cached six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+Using cached streamlit-1.60.0-py3-none-any.whl (10.4 MB)
+Using cached altair-6.2.2-py3-none-any.whl (797 kB)
+Using cached anyio-4.14.2-py3-none-any.whl (125 kB)
+Using cached blinker-1.9.0-py3-none-any.whl (8.5 kB)
+Using cached click-8.4.2-py3-none-any.whl (119 kB)
+Using cached gitpython-3.1.57-py3-none-any.whl (217 kB)
+Using cached gitdb-4.0.12-py3-none-any.whl (62 kB)
+Using cached httptools-0.8.0-cp313-cp313-macosx_11_0_arm64.whl (111 kB)
+Using cached itsdangerous-2.2.0-py3-none-any.whl (16 kB)
+Using cached numpy-2.5.1-cp313-cp313-macosx_14_0_arm64.whl (5.3 MB)
+Using cached pandas-3.0.5-cp313-cp313-macosx_11_0_arm64.whl (9.9 MB)
+Using cached pillow-12.3.0-cp313-cp313-macosx_11_0_arm64.whl (4.8 MB)
+Using cached protobuf-7.35.1-cp310-abi3-macosx_10_9_universal2.whl (433 kB)
+Using cached pyarrow-24.0.0-cp313-cp313-macosx_12_0_arm64.whl (35.0 MB)
+Using cached pydeck-0.9.3-py2.py3-none-any.whl (11.4 MB)
+Using cached python_multipart-0.0.32-py3-none-any.whl (30 kB)
+Using cached requests-2.34.2-py3-none-any.whl (73 kB)
+Using cached charset_normalizer-3.4.9-cp313-cp313-macosx_10_13_universal2.whl (317 kB)
+Using cached idna-3.18-py3-none-any.whl (65 kB)
+Using cached smmap-5.0.3-py3-none-any.whl (24 kB)
+Using cached starlette-1.3.1-py3-none-any.whl (73 kB)
+Using cached tenacity-9.1.4-py3-none-any.whl (28 kB)
+Using cached toml-0.10.2-py2.py3-none-any.whl (16 kB)
+Using cached typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+Using cached urllib3-2.7.0-py3-none-any.whl (131 kB)
+Using cached uvicorn-0.52.1-py3-none-any.whl (79 kB)
+Using cached websockets-16.1.1-cp313-cp313-macosx_11_0_arm64.whl (177 kB)
+Using cached pytest-9.1.1-py3-none-any.whl (386 kB)
+Using cached pluggy-1.6.0-py3-none-any.whl (20 kB)
+Using cached anthropic-0.120.2-py3-none-any.whl (1.0 MB)
+Using cached distro-1.9.0-py3-none-any.whl (20 kB)
+Using cached docstring_parser-0.18.0-py3-none-any.whl (22 kB)
+Using cached httpx-0.28.1-py3-none-any.whl (73 kB)
+Using cached httpcore-1.0.9-py3-none-any.whl (78 kB)
+Using cached jiter-0.16.0-cp313-cp313-macosx_11_0_arm64.whl (306 kB)
+Using cached pydantic-2.13.4-py3-none-any.whl (472 kB)
+Using cached pydantic_core-2.46.4-cp313-cp313-macosx_11_0_arm64.whl (2.0 MB)
+Using cached annotated_types-0.8.0-py3-none-any.whl (13 kB)
+Using cached certifi-2026.7.22-py3-none-any.whl (136 kB)
+Using cached h11-0.16.0-py3-none-any.whl (37 kB)
+Using cached iniconfig-2.3.0-py3-none-any.whl (7.5 kB)
+Using cached jinja2-3.1.6-py3-none-any.whl (134 kB)
+Using cached jsonschema-4.26.0-py3-none-any.whl (90 kB)
+Using cached attrs-26.1.0-py3-none-any.whl (67 kB)
+Using cached jsonschema_specifications-2025.9.1-py3-none-any.whl (18 kB)
+Using cached markupsafe-3.0.3-cp313-cp313-macosx_11_0_arm64.whl (12 kB)
+Using cached narwhals-2.24.0-py3-none-any.whl (461 kB)
+Using cached packaging-26.2-py3-none-any.whl (100 kB)
+Using cached pygments-2.20.0-py3-none-any.whl (1.2 MB)
+Using cached python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+Using cached referencing-0.37.0-py3-none-any.whl (26 kB)
+Using cached rpds_py-2026.6.3-cp313-cp313-macosx_11_0_arm64.whl (338 kB)
+Using cached six-1.17.0-py2.py3-none-any.whl (11 kB)
+Using cached typing_inspection-0.4.2-py3-none-any.whl (14 kB)
+Using cached sniffio-1.3.1-py3-none-any.whl (10 kB)
+Installing collected packages: websockets, urllib3, typing-extensions, toml, tenacity, sniffio, smmap, six, rpds-py, python-multipart, pygments, pyarrow, protobuf, pluggy, pillow, packaging, numpy, narwhals, MarkupSafe, jiter, itsdangerous, iniconfig, idna, httptools, h11, docstring-parser, distro, click, charset_normalizer, certifi, blinker, attrs, annotated-types, uvicorn, typing-inspection, requests, referencing, python-dateutil, pytest, pydantic-core, jinja2, httpcore, gitdb, anyio, starlette, pydeck, pydantic, pandas, jsonschema-specifications, httpx, gitpython, jsonschema, anthropic, altair, streamlit
+
+Successfully installed MarkupSafe-3.0.3 altair-6.2.2 annotated-types-0.8.0 anthropic-0.120.2 anyio-4.14.2 attrs-26.1.0 blinker-1.9.0 certifi-2026.7.22 charset_normalizer-3.4.9 click-8.4.2 distro-1.9.0 docstring-parser-0.18.0 gitdb-4.0.12 gitpython-3.1.57 h11-0.16.0 httpcore-1.0.9 httptools-0.8.0 httpx-0.28.1 idna-3.18 iniconfig-2.3.0 itsdangerous-2.2.0 jinja2-3.1.6 jiter-0.16.0 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 narwhals-2.24.0 numpy-2.5.1 packaging-26.2 pandas-3.0.5 pillow-12.3.0 pluggy-1.6.0 protobuf-7.35.1 pyarrow-24.0.0 pydantic-2.13.4 pydantic-core-2.46.4 pydeck-0.9.3 pygments-2.20.0 pytest-9.1.1 python-dateutil-2.9.0.post0 python-multipart-0.0.32 referencing-0.37.0 requests-2.34.2 rpds-py-2026.6.3 six-1.17.0 smmap-5.0.3 sniffio-1.3.1 starlette-1.3.1 streamlit-1.60.0 tenacity-9.1.4 toml-0.10.2 typing-extensions-4.16.0 typing-inspection-0.4.2 urllib3-2.7.0 uvicorn-0.52.1 websockets-16.1.1
+```
+
+Installed package versions match `requirements.txt`'s pinned ranges (`streamlit>=1.30`, `pytest>=7.0`, `anthropic>=0.40.0`) and are consistent with the `pip freeze` output recorded in Section 1. The temporary environment was removed after installation (`deactivate && rm -rf .venv-evidence`) and never affected the project's regular `.venv`.
 
 ## 3. Full Pytest Output
 
@@ -265,52 +452,22 @@ Note: Mochi's "Feed breakfast" and Biscuit's "Morning walk" are both due 08:00 o
 Entered via a script that calls the same Owner/Pet/Task classes and ai_assistant.answer_question() that app.py's Streamlit UI calls (see the "Exact Commands" section below) rather than by clicking through the browser, since no browser-automation tool was available in this session. Functionally equivalent to entering this data by hand in the "Quick Demo Inputs" / "Tasks" sections of the running app.
 ```
 
-## 6. Three Successful AI Interactions
+## 6. Live Claude Interaction Evidence Not Performed (By Decision)
 
-**STATUS: NOT YET CAPTURED.** No `ANTHROPIC_API_KEY` was configured in the environment this evidence was collected in, so every question run so far (see `evaluation_results.md`) hit a deterministic fallback (`fallback_used=True`) rather than a real Claude-generated, validated answer. Per the "do not invent results" instruction, the three interactions below are left as placeholders rather than filled with fabricated text.
+Using a real `ANTHROPIC_API_KEY` was a deliberate project decision for this submission, not an oversight or a temporary gap: `ANTHROPIC_API_KEY` was intentionally left unset while collecting this evidence (confirmed at collection time; see Section 7's `missing_api_key` fallback for the same observation captured through the application code path itself). As a result, no real Claude-generated output is claimed anywhere in this document or in `evaluation_results.md`.
 
-To complete this section: export a real `ANTHROPIC_API_KEY` in your own terminal (do not paste it into chat), run `streamlit run app.py`, re-enter the same deterministic sample data from Section 5, ask the three questions below, and paste back for each: the final answer, detected intent, detected pet, validation confidence, retrieved context, and fallback status (should be `fallback_used=No` for all three if the AI answer passes validation).
+What was actually verified instead:
 
-Three cases where `answer_question()` returned `success=True` (a real Claude-generated answer passed validation, `fallback_used=False`). Use the "Retrieved PawPal+ Context" expander in the UI as the source for "Retrieved context".
+* Claude API orchestration in `ai_assistant.py` (request construction, response parsing, error handling) was exercised using **mocked Anthropic API clients** injected via the `client=` parameter — never a real network call to Anthropic.
+* The real application workflow — intent detection, context retrieval, answer validation, and fallback formatting in `retrieval.py`, `validators.py`, and `ai_assistant.py` — was exercised end-to-end through **deterministic fallback responses**, which do not depend on the Anthropic API being reachable.
+* The automated test suite (`tests/test_ai_assistant.py`, 126 tests total passing — see Section 3) verifies, using mocked clients, each of the following code paths:
+  * **Successful-response path** — `test_successful_grounded_answer`, `test_detected_intent_is_returned`, `test_detected_pet_is_returned`, `test_multiple_text_blocks_are_joined`
+  * **API-error path** — `test_api_exception_falls_back`
+  * **Malformed-response path** — `test_malformed_api_response_falls_back`, `test_malformed_api_response_missing_content_attribute_falls_back`, `test_empty_api_response_falls_back`
+  * **Validation-failure path** — `test_validation_failure_causes_fallback`, `test_autonomous_action_claim_causes_fallback`, `test_veterinary_language_causes_fallback`, `test_conflict_contradiction_causes_fallback`
+  * **Secret-protection path** — `test_api_key_never_appears_in_returned_errors`
 
-### Interaction 1
-
-```text
-User question:      [FILL IN]
-Retrieved context:   [PASTE context_text FROM THE "Retrieved PawPal+ Context" EXPANDER]
-AI answer:           [PASTE THE TEXT SHOWN UNDER "Answer:"]
-Intent:              [FILL IN, e.g. incomplete_tasks]
-Detected pet:        [FILL IN OR "none"]
-Confidence:          [PASTE "Validation confidence" VALUE]
-Fallback used:       No
-Fallback reason:     N/A
-```
-
-### Interaction 2
-
-```text
-User question:      [FILL IN]
-Retrieved context:   [PASTE context_text FROM THE "Retrieved PawPal+ Context" EXPANDER]
-AI answer:           [PASTE THE TEXT SHOWN UNDER "Answer:"]
-Intent:              [FILL IN]
-Detected pet:        [FILL IN OR "none"]
-Confidence:          [PASTE "Validation confidence" VALUE]
-Fallback used:       No
-Fallback reason:     N/A
-```
-
-### Interaction 3
-
-```text
-User question:      [FILL IN]
-Retrieved context:   [PASTE context_text FROM THE "Retrieved PawPal+ Context" EXPANDER]
-AI answer:           [PASTE THE TEXT SHOWN UNDER "Answer:"]
-Intent:              [FILL IN]
-Detected pet:        [FILL IN OR "none"]
-Confidence:          [PASTE "Validation confidence" VALUE]
-Fallback used:       No
-Fallback reason:     N/A
-```
+**Live model execution was intentionally not performed for this evidence collection — a scope decision, not a limitation to be resolved.** No question, answer, intent, pet, confidence score, or context in this document is presented as coming from a real Claude API response — every fallback interaction recorded in Sections 5, 7, 8, and 9 was produced by the deterministic fallback path, which activates precisely because no live API key was configured. The Claude integration itself is fully implemented in `ai_assistant.py`; only its execution against the live Anthropic API was out of scope for this submission.
 
 ## 7. One Deterministic Fallback Interaction
 
@@ -373,7 +530,7 @@ Paste a **few relevant, sanitized** lines from `logs/pawpal_ai.log` (or the cons
 2026-08-01 21:18:03,972 | INFO | pawpal_ai.ai_assistant | Processing completed. success=False fallback_used=True
 ```
 
-Taken from `logs/pawpal_ai.log` after running the Section 6/7 test questions (no API keys or full prompt text appear in these log lines — `ai_assistant.py` never logs the prompt or the key, only intent/fallback-reason/status metadata).
+Taken from `logs/pawpal_ai.log` after running the Section 8 test question (TC-04, "What is today's schedule?" — note the `todays_schedule` intent below matches Section 8, not the incomplete-tasks question in Section 7) (no API keys or full prompt text appear in these log lines — `ai_assistant.py` never logs the prompt or the key, only intent/fallback-reason/status metadata).
 
 ## 10. Human Evaluation Summary
 
@@ -395,12 +552,14 @@ Key observations:       retrieval.detect_intent() originally misrouted two of ap
                         Deterministic fallback formatting, unknown-pet handling,
                         blank-question handling, and unsupported-question handling were
                         all correct throughout, with no fabricated data.
-Known limitations:      (1) No ANTHROPIC_API_KEY was available in this environment, so
-                        Section 6 (three successful AI-generated, validated interactions)
-                        is still pending a run with a real key. (2) app.py exposes no
-                        "mark complete" UI control, so the "completed tasks" case (TC-02)
-                        could only be verified against zero completed tasks, not a
-                        genuinely mixed complete/incomplete data set.
+Known limitations:      (1) No ANTHROPIC_API_KEY was used in this environment — a
+                        deliberate decision for this submission, not an oversight — so
+                        Section 6 documents mocked-client and deterministic-fallback
+                        verification instead of live, AI-generated, validated
+                        interactions. (2) app.py exposes no "mark complete" UI control,
+                        so the "completed tasks" case (TC-02) could only be verified
+                        against zero completed tasks, not a genuinely mixed
+                        complete/incomplete data set.
 ```
 
 ## Exact Commands to Collect This Evidence

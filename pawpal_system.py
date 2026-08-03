@@ -1,9 +1,9 @@
 """PawPal+ logic layer.
 
-Backend classes for PawPal+, based on diagrams/uml.mmd:
-Pet, Task, Owner, Scheduler.
-
-Class skeleton only: names, attributes, and empty method stubs (no logic yet).
+Core PawPal+ backend, based on diagrams/uml.mmd. Implements the Owner, Pet,
+Task, and Scheduler classes, providing task management, recurring task
+generation, schedule generation, and conflict detection, along with helper
+methods used by the Streamlit application and the AI retrieval pipeline.
 """
 
 from datetime import date, timedelta

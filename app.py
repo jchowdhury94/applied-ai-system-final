@@ -47,12 +47,15 @@ st.title("🐾 PawPal+")
 
 st.markdown(
     """
-Welcome to the PawPal+ starter app.
+Welcome to PawPal+.
 
-This file is intentionally thin. It gives you a working Streamlit app so you can start quickly,
-but **it does not implement the project logic**. Your job is to design the system and build it.
+PawPal+ AI is a finished pet care planning assistant. It lets you manage your
+pets, manage their pet-care tasks, generate schedules, and detect scheduling
+conflicts, and it lets you ask grounded AI questions about your stored
+pet-care data using Retrieval-Augmented Generation (RAG).
 
-Use this app as your interactive demo once your backend classes/functions exist.
+PawPal+ AI is read-only, does not modify any stored data, and is not intended
+for veterinary diagnosis or treatment advice.
 """
 )
 
@@ -62,18 +65,22 @@ with st.expander("Scenario", expanded=True):
 **PawPal+** is a pet care planning assistant. It helps a pet owner plan care tasks
 for their pet(s) based on constraints like time, priority, and preferences.
 
-You will design and implement the scheduling logic and connect it to this Streamlit UI.
+The scheduling logic is implemented and connected to this Streamlit UI.
 """
     )
 
-with st.expander("What you need to build", expanded=True):
+with st.expander("What PawPal+ AI does", expanded=True):
     st.markdown(
         """
-At minimum, your system should:
-- Represent pet care tasks (what needs to happen, how long it takes, priority)
-- Represent the pet and the owner (basic info and preferences)
-- Build a plan/schedule for a day that chooses and orders tasks based on constraints
-- Explain the plan (why each task was chosen and when it happens)
+PawPal+ AI:
+- Accepts natural-language questions about your stored pets and tasks
+- Detects one of the supported question intents
+- Retrieves relevant data from the existing Owner, Pet, Task, and Scheduler objects
+- Sends only that retrieved context to Claude
+- Validates the generated response with deterministic guardrails
+- Falls back to a deterministic answer if the API is unavailable or validation fails
+- Is read-only and never modifies pet or task data
+- Does not provide veterinary diagnosis or treatment advice
 """
     )
 

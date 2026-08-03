@@ -201,6 +201,7 @@ def answer_question(question, owner, reference_date=None, client=None, model=Non
             model=model_name,
             max_tokens=MAX_ANSWER_TOKENS,
             system=_SYSTEM_PROMPT,
+            thinking={"type": "disabled"},
             messages=[{"role": "user", "content": user_prompt}],
         )
     except Exception as exc:
