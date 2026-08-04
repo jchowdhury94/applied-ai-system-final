@@ -1,3 +1,4 @@
+import os
 from datetime import date
 
 import streamlit as st
@@ -217,6 +218,12 @@ if st.button("Generate schedule"):
 st.divider()
 
 st.subheader("Ask PawPal+ AI")
+
+if os.environ.get("ANTHROPIC_API_KEY"):
+    st.caption("✅ AI model configured.")
+else:
+    st.caption("⚠️ AI model unavailable. PawPal+ will use its safe fallback.")
+
 with st.expander("Example questions"):
     st.markdown(
         """

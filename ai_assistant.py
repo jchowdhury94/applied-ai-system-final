@@ -13,6 +13,10 @@ or reschedule anything - it only answers questions about existing data.
 
 import os
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from logger_config import get_logger
 import retrieval
 import validators
@@ -20,8 +24,10 @@ import validators
 logger = get_logger(__name__)
 
 # Keep the model name in exactly one place. ANTHROPIC_MODEL overrides this;
-# the `model` parameter to answer_question() overrides both.
-DEFAULT_MODEL = "claude-opus-5"
+# the `model` parameter to answer_question() overrides both. Haiku 4.5 is a
+# currently supported, low-cost model well suited to this classroom demo;
+# set ANTHROPIC_MODEL in .env to use a different one (e.g. claude-opus-5).
+DEFAULT_MODEL = "claude-haiku-4-5"
 
 MAX_ANSWER_TOKENS = 500
 
