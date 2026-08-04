@@ -1,9 +1,32 @@
 from datetime import date
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 import ai_assistant
 from pawpal_system import Owner, Pet, Task, Scheduler
+
+
+def clear_everything():
+    keys_to_clear = [
+        "owner",
+        "last_ai_result",
+        "owner_name_input",
+        "pet_name_input",
+        "species_input",
+        "pet_age_input",
+        "pet_needs_input",
+        "task_pet_input",
+        "task_description_input",
+        "task_time_input",
+        "task_frequency_input",
+        "ai_question",
+        "confirm_clear",
+    ]
+
+    for key in keys_to_clear:
+        if key in st.session_state:
+            del st.session_state[key]
 
 
 def _render_ai_result(result):
@@ -45,45 +68,6 @@ st.set_page_config(page_title="PawPal+", page_icon="🐾", layout="centered")
 
 st.title("🐾 PawPal+")
 
-st.markdown(
-    """
-Welcome to PawPal+.
-
-PawPal+ AI is a finished pet care planning assistant. It lets you manage your
-pets, manage their pet-care tasks, generate schedules, and detect scheduling
-conflicts, and it lets you ask grounded AI questions about your stored
-pet-care data using Retrieval-Augmented Generation (RAG).
-
-PawPal+ AI is read-only, does not modify any stored data, and is not intended
-for veterinary diagnosis or treatment advice.
-"""
-)
-
-with st.expander("Scenario", expanded=True):
-    st.markdown(
-        """
-**PawPal+** is a pet care planning assistant. It helps a pet owner plan care tasks
-for their pet(s) based on constraints like time, priority, and preferences.
-
-The scheduling logic is implemented and connected to this Streamlit UI.
-"""
-    )
-
-with st.expander("What PawPal+ AI does", expanded=True):
-    st.markdown(
-        """
-PawPal+ AI:
-- Accepts natural-language questions about your stored pets and tasks
-- Detects one of the supported question intents
-- Retrieves relevant data from the existing Owner, Pet, Task, and Scheduler objects
-- Sends only that retrieved context to Claude
-- Validates the generated response with deterministic guardrails
-- Falls back to a deterministic answer if the API is unavailable or validation fails
-- Is read-only and never modifies pet or task data
-- Does not provide veterinary diagnosis or treatment advice
-"""
-    )
-
 st.divider()
 
 if "owner" not in st.session_state:
@@ -92,40 +76,91 @@ if "owner" not in st.session_state:
     )
 owner = st.session_state.owner
 
-st.subheader("Quick Demo Inputs (UI only)")
-owner_name = st.text_input("Owner name", value="Jordan")
-pet_name = st.text_input("Pet name", value="Mochi")
-species = st.selectbox("Species", ["dog", "cat", "other"])
-age = st.number_input("Pet age", min_value=0, max_value=50, value=2)
-needs = st.text_input("Pet needs (comma-separated)", value="walk, feed")
+st.subheader("Add a Pet")
+owner_name = st.text_input(
+    "Owner name",
+    placeholder="Enter owner name",
+    key="owner_name_input"
+)
+
+pet_name = st.text_input(
+    "Pet name",
+    placeholder="Enter pet name",
+    key="pet_name_input"
+)
+
+species = st.selectbox(
+    "Species",
+    ["Select a species", "dog", "cat", "other"],
+    key="species_input"
+)
+
+age = st.number_input(
+    "Pet age",
+    min_value=0,
+    max_value=50,
+    value=None,
+    placeholder="Enter pet age",
+    key="pet_age_input"
+)
+
+needs = st.text_input(
+    "Pet needs (comma-separated)",
+    placeholder="For example: walk, feed",
+    key="pet_needs_input"
+)
 
 if st.button("Add pet"):
-    pet = Pet(
-        name=pet_name,
-        species=species,
-        age=int(age),
-        needs=[need.strip() for need in needs.split(",") if need.strip()],
-    )
-    owner.add_pet(pet)
-    st.success(f"Added {pet.name} to {owner_name}'s pets.")
+    if not owner_name.strip():
+        st.warning("Please enter the owner's name.")
+    elif not pet_name.strip():
+        st.warning("Please enter the pet's name.")
+    elif species == "Select a species":
+        st.warning("Please select a species.")
+    elif age is None:
+        st.warning("Please enter the pet's age.")
+    else:
+        pet = Pet(
+            name=pet_name.strip(),
+            species=species,
+            age=int(age),
+            needs=[
+                need.strip()
+                for need in needs.split(",")
+                if need.strip()
+            ],
+        )
+        owner.add_pet(pet)
+        st.success(f"Added {pet.name} to {owner_name}'s pets.")
 
 st.markdown("### Tasks")
-st.caption("Add a few tasks. Tasks are attached to the selected pet.")
 
 if not owner.pets:
     st.info("Add a pet above before creating tasks.")
 else:
     pet_names = [p.name for p in owner.pets]
-    selected_pet_name = st.selectbox("Pet", pet_names)
+    selected_pet_name = st.selectbox("Pet", pet_names, key="task_pet_input")
     selected_pet = owner.get_pet(selected_pet_name)
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        description = st.text_input("Task description", value="Morning walk")
+        description = st.text_input(
+            "Task description",
+            placeholder="For example: Morning walk",
+            key="task_description_input"
+        )
     with col2:
-        time = st.text_input("Time", value="07:00")
+        time = st.text_input(
+            "Time",
+            placeholder="For example: 07:00",
+            key="task_time_input"
+        )
     with col3:
-        frequency = st.selectbox("Frequency", ["daily", "weekly", "monthly"])
+        frequency = st.selectbox(
+            "Frequency",
+            ["daily", "weekly", "monthly"],
+            key="task_frequency_input"
+        )
 
     if st.button("Add task"):
         task = Task(description=description, time=time, frequency=frequency)
@@ -151,7 +186,6 @@ else:
 st.divider()
 
 st.subheader("Build Schedule")
-st.caption("This button should call your scheduling logic once you implement it.")
 
 if st.button("Generate schedule"):
     if not owner.pets:
@@ -183,15 +217,7 @@ if st.button("Generate schedule"):
 st.divider()
 
 st.subheader("Ask PawPal+ AI")
-st.markdown(
-    "This assistant answers questions using the pets and tasks currently "
-    "stored in this Streamlit session (`st.session_state.owner`). It is "
-    "**read-only** - it cannot add, delete, complete, or reschedule anything."
-)
-st.caption(
-    "PawPal+ AI does not provide veterinary diagnosis or treatment advice."
-)
-with st.expander("Example questions you can ask"):
+with st.expander("Example questions"):
     st.markdown(
         """
 - What tasks are incomplete?
@@ -215,3 +241,22 @@ if st.button("Ask PawPal+ AI"):
 
 if "last_ai_result" in st.session_state:
     _render_ai_result(st.session_state.last_ai_result)
+
+st.divider()
+st.subheader("Reset Application")
+
+confirm_clear = st.checkbox(
+    "I understand that this will remove all pets and tasks from this session.",
+    key="confirm_clear",
+)
+
+if st.button(
+    "Clear Everything",
+    type="primary",
+    disabled=not confirm_clear,
+):
+    clear_everything()
+    # Streamlit's text_input/number_input widgets don't visually reset after
+    # st.rerun() once a user has typed into them - only a full page reload
+    # re-syncs their displayed value with the cleared session state.
+    components.html("<script>window.parent.location.reload()</script>", height=0)
