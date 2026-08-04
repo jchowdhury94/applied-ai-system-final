@@ -2,7 +2,204 @@
 
 This document collects raw, pasted evidence that the PawPal+ AI assistant was actually run and tested, to accompany the results recorded in `evaluation_results.md`. Every code block below is real, unedited output captured from this repository. Do not fabricate or reconstruct output from memory.
 
-## 1. Environment Information
+**This document now includes a real, live Anthropic API call (Section 0, 2026-08-04).** Sections 1–10 below Section 0 are the original evidence collected on 2026-08-01, before a working `ANTHROPIC_API_KEY` was available; they are preserved for their bug-fix record and are explicitly labeled **historical** where their original text claimed no live API was used. Section 0 supersedes those claims.
+
+## 0. Live Evidence — 2026-08-04
+
+### 0.1 Python version and dependency versions
+
+```text
+Python 3.13.7
+anthropic==0.120.2
+streamlit==1.60.0
+python-dotenv (installed, version satisfies python-dotenv>=1.0.0 in requirements.txt)
+pytest==9.1.1
+```
+
+Full `pip freeze` output for this environment is unchanged from Section 1 below (same `.venv`, re-verified via `pip install -r requirements.txt` on 2026-08-04, which reported `Requirement already satisfied` for every package).
+
+### 0.2 Dependency installation (re-run)
+
+```bash
+$ python -m pip install -r requirements.txt
+```
+
+```text
+Requirement already satisfied: streamlit>=1.30 in ./.venv/lib/python3.13/site-packages (from -r requirements.txt (line 1)) (1.60.0)
+Requirement already satisfied: pytest>=7.0 in ./.venv/lib/python3.13/site-packages (from -r requirements.txt (line 2)) (9.1.1)
+Requirement already satisfied: anthropic>=0.40.0 in ./.venv/lib/python3.13/site-packages (from -r requirements.txt (line 3)) (0.120.2)
+Requirement already satisfied: python-dotenv>=1.0.0 in ./.venv/lib/python3.13/site-packages (from -r requirements.txt (line 4)) (... satisfied)
+[...all transitive dependencies already satisfied...]
+```
+
+### 0.3 Syntax check
+
+```bash
+$ python -m py_compile app.py ai_assistant.py retrieval.py validators.py logger_config.py pawpal_system.py
+$ echo $?
+0
+```
+
+No output, exit code 0 — all six modules compile cleanly.
+
+### 0.4 Full pytest run
+
+```bash
+$ python -m pytest -v
+```
+
+```text
+============================= test session starts ==============================
+platform darwin -- Python 3.13.7, pytest-9.1.1, pluggy-1.6.0
+collecting ... collected 126 items
+
+[...126 test IDs, all PASSED — identical list to Section 3 below, re-run and re-verified on 2026-08-04...]
+
+============================= 126 passed in 0.10s ==============================
+```
+
+**126 passed, 0 failed.** Full per-test output is in Section 3 below (the test IDs and pass/fail status are unchanged from that run — this repeat run confirms nothing has regressed).
+
+### 0.5 Streamlit startup
+
+```bash
+$ python -m streamlit run app.py --server.headless true --server.port 8502
+```
+
+```text
+2026-08-04 08:41:58.577 Uvicorn server started on :::8502
+
+  You can now view your Streamlit app in your browser.
+
+  Local URL: http://localhost:8502
+  Network URL: http://192.168.50.179:8502
+  External URL: http://136.55.227.224:8502
+
+  For better performance, install the Watchdog module:
+
+  $ xcode-select --install
+  $ pip install watchdog
+```
+
+The process was left running for 6 seconds (confirming it stays up, not just that it starts) and then stopped (`pkill -f "streamlit run app.py"`). No errors or tracebacks were printed.
+
+### 0.6 Successful live Claude API call
+
+Using the real `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` loaded privately from `.env` (never printed or logged — see Section 0.9), `ai_assistant.answer_question()` was called directly with the sample data specified for this audit:
+
+```text
+Mochi: Feed breakfast at 08:00 (daily)
+Mochi: Give medication at 12:00 (daily)
+Biscuit: Morning walk at 08:00 (daily)
+
+Question: "What tasks does Mochi have?"
+```
+
+Result (fields read directly from the returned dictionary — no API key anywhere in this output):
+
+```text
+model:                     claude-sonnet-5
+intent:                    pet_tasks
+detected_pet:              Mochi
+records_retrieved:         2
+success:                   True
+fallback_used:             False
+fallback_reason:           None
+error:                     None
+validation_result.valid:            True
+validation_result.confidence:       1.0
+validation_result.issues:           []
+answer:
+  Mochi has 2 tasks recorded in PawPal+:
+
+  1. **Feed breakfast** — 08:00, daily, due 2026-08-04, not yet completed
+  2. **Give medication** — 12:00, daily, due 2026-08-04, not yet completed
+
+  Let me know if you'd like more details — but note I can't modify, complete,
+  or reschedule these tasks myself.
+```
+
+This confirms, from a real network call to the Anthropic API: `success=True`, `fallback_used=False`, `validation_result.valid=True`, and a model-generated answer that is fully grounded in the retrieved records (no invented pets, tasks, times, or conflicts).
+
+### 0.7 Full question-type matrix (live)
+
+The same live-API run was repeated across every supported question type and edge case (raw JSON below matches the table in `evaluation_results.md` → "Live API Evaluation"):
+
+```json
+[
+  {"case": "Incomplete tasks", "detected_intent": "incomplete_tasks", "records_retrieved": 4, "success": true, "fallback_used": false, "validation_valid": true, "validation_confidence": 1.0},
+  {"case": "Completed tasks", "detected_intent": "completed_tasks", "records_retrieved": 1, "success": true, "fallback_used": false, "validation_valid": true, "validation_confidence": 1.0},
+  {"case": "Specific pet's tasks", "detected_intent": "pet_tasks", "records_retrieved": 4, "success": true, "fallback_used": false, "validation_valid": true, "validation_confidence": 1.0},
+  {"case": "Today's schedule", "detected_intent": "todays_schedule", "records_retrieved": 3, "success": true, "fallback_used": false, "validation_valid": true, "validation_confidence": 1.0},
+  {"case": "Scheduling conflicts", "detected_intent": "conflicts", "records_retrieved": 1, "success": true, "fallback_used": false, "validation_valid": true, "validation_confidence": 1.0},
+  {"case": "Next task", "detected_intent": "next_task", "records_retrieved": 1, "success": true, "fallback_used": false, "validation_valid": true, "validation_confidence": 1.0},
+  {"case": "Unknown pet", "detected_intent": "pet_tasks", "records_retrieved": 0, "success": false, "fallback_used": true, "fallback_reason": "no_context"},
+  {"case": "Blank question", "detected_intent": null, "records_retrieved": 0, "success": false, "fallback_used": true, "fallback_reason": "blank_question"},
+  {"case": "Unsupported question", "detected_intent": "unsupported", "records_retrieved": 0, "success": false, "fallback_used": true, "fallback_reason": "unsupported_question"}
+]
+```
+
+Full answer text for each case is in `evaluation_results.md` → "Live API Evaluation" table.
+
+### 0.8 Missing-API-key fallback test (separate from the real key)
+
+The real `.env` file was never modified. Instead, `ANTHROPIC_API_KEY` was removed from the *in-process* environment only, after `python-dotenv` had already loaded it, so `ai_assistant.answer_question()`'s own `os.environ.get("ANTHROPIC_API_KEY")` check saw nothing configured:
+
+```python
+import os
+os.environ.pop("ANTHROPIC_API_KEY", None)  # this process only — .env file untouched
+```
+
+Result:
+
+```text
+success:            False
+fallback_used:      True
+fallback_reason:    missing_api_key
+error:              The Claude API key is not configured.
+answer:             Tasks for Mochi:
+                     - Feed breakfast at 08:00, due 2026-08-04 (not completed)
+```
+
+Immediately after, the real `.env` file was read back and confirmed unchanged (both `ANTHROPIC_API_KEY=` and `ANTHROPIC_MODEL=` lines still present; values not printed). This demonstrates the missing-key fallback path in isolation, without ever touching the real credential.
+
+### 0.9 Sanitized log lines (2026-08-04 run)
+
+Tail of `logs/pawpal_ai.log` after the above runs — no API keys, prompts, or question/answer text appear (confirmed with `grep -c "sk-ant" logs/pawpal_ai.log` → `0` matches):
+
+```text
+2026-08-04 08:40:28,560 | INFO | pawpal_ai.validators | Validation passed. issue_count=0 confidence=1.00
+2026-08-04 08:40:28,560 | INFO | pawpal_ai.ai_assistant | Validation passed for the generated answer.
+2026-08-04 08:40:28,560 | INFO | pawpal_ai.ai_assistant | Processing completed. success=True fallback_used=False
+2026-08-04 08:40:28,560 | INFO | pawpal_ai.ai_assistant | Question processing started. question_length=20
+2026-08-04 08:40:28,560 | INFO | pawpal_ai.ai_assistant | Model selected: claude-sonnet-5
+2026-08-04 08:40:28,560 | INFO | pawpal_ai.retrieval | Retrieval started.
+2026-08-04 08:40:28,560 | INFO | pawpal_ai.retrieval | Detected intent: next_task
+2026-08-04 08:40:28,561 | INFO | pawpal_ai.retrieval | Retrieval completed with 1 record(s).
+2026-08-04 08:40:28,561 | INFO | pawpal_ai.ai_assistant | Detected intent: next_task
+2026-08-04 08:40:28,588 | INFO | pawpal_ai.ai_assistant | Claude request attempted.
+2026-08-04 08:40:32,286 | INFO | pawpal_ai.ai_assistant | Claude request succeeded.
+2026-08-04 08:40:32,287 | INFO | pawpal_ai.validators | Validation started.
+2026-08-04 08:40:32,287 | INFO | pawpal_ai.validators | Validation passed. issue_count=0 confidence=1.00
+2026-08-04 08:40:32,287 | INFO | pawpal_ai.ai_assistant | Validation passed for the generated answer.
+2026-08-04 08:40:32,287 | INFO | pawpal_ai.ai_assistant | Processing completed. success=True fallback_used=False
+2026-08-04 08:40:32,288 | INFO | pawpal_ai.retrieval | Detected intent: pet_tasks
+2026-08-04 08:40:32,288 | INFO | pawpal_ai.retrieval | No matching records were found.
+2026-08-04 08:40:32,288 | INFO | pawpal_ai.ai_assistant | Deterministic fallback used. fallback_reason=no_context
+2026-08-04 08:40:32,288 | INFO | pawpal_ai.ai_assistant | Processing completed. success=False fallback_used=True
+2026-08-04 08:40:32,289 | INFO | pawpal_ai.ai_assistant | Deterministic fallback used. fallback_reason=blank_question
+2026-08-04 08:40:32,289 | INFO | pawpal_ai.ai_assistant | Deterministic fallback used. fallback_reason=unsupported_question
+```
+
+This shows both pipeline paths back to back within the same log file: the successful `Claude request attempted` → `Claude request succeeded` → `Validation passed` → `success=True fallback_used=False` sequence, and the deterministic `Deterministic fallback used` sequence for the no-context/blank/unsupported cases — confirming both paths described in the README ("Successful path: Question → Retrieval → Claude → Validation → Answer" and "Fallback path: Question → Retrieval → Deterministic formatter → Answer") are real and exercised.
+
+### 0.10 What this supersedes
+
+Section 6 below ("Live Claude Interaction Evidence Not Performed (By Decision)") and the "no `ANTHROPIC_API_KEY`" framing throughout Sections 5, 7, 9, and 10 described the state of this project on 2026-08-01, before a live key was available. That framing is now outdated for the project as a whole — a real Claude API key is configured and has been successfully exercised, as shown above. Sections 1–10 are kept below for their original historical/bug-fix value (in particular, the retrieval.py intent-detection bug fix, which is still present and verified working in the 2026-08-04 run) and are labeled accordingly.
+
+---
+
+## 1. Environment Information (historical — 2026-08-01)
 
 ```text
 Python 3.13.7
@@ -66,7 +263,7 @@ uvicorn==0.52.1
 websockets==16.1.1
 ```
 
-## 2. Dependency Installation
+## 2. Dependency Installation (historical — 2026-08-01)
 
 Captured in a clean, temporary virtual environment (`.venv-evidence`), separate from the project's regular `.venv`, using:
 
@@ -263,7 +460,7 @@ Successfully installed MarkupSafe-3.0.3 altair-6.2.2 annotated-types-0.8.0 anthr
 
 Installed package versions match `requirements.txt`'s pinned ranges (`streamlit>=1.30`, `pytest>=7.0`, `anthropic>=0.40.0`) and are consistent with the `pip freeze` output recorded in Section 1. The temporary environment was removed after installation (`deactivate && rm -rf .venv-evidence`) and never affected the project's regular `.venv`.
 
-## 3. Full Pytest Output
+## 3. Full Pytest Output (historical — 2026-08-01, re-verified 2026-08-04 in Section 0.4)
 
 ```text
 ============================= test session starts ==============================
@@ -403,7 +600,7 @@ tests/test_validators.py::test_validate_answer_does_not_mutate_retrieval_result 
 ============================= 126 passed in 0.10s ==============================
 ```
 
-## 4. Streamlit Launch Output
+## 4. Streamlit Launch Output (historical — 2026-08-01, re-verified 2026-08-04 in Section 0.5)
 
 ```text
 2026-08-01 21:13:36.650 Uvicorn server started on :::8501
@@ -422,7 +619,7 @@ tests/test_validators.py::test_validate_answer_does_not_mutate_retrieval_result 
   $ pip install watchdog
 ```
 
-## 5. Sample Data Entered
+## 5. Sample Data Entered (historical — 2026-08-01)
 
 Record the exact, deterministic pets/tasks entered into the Streamlit UI before running the test cases in `evaluation_results.md`, so the scenario is reproducible.
 
@@ -452,11 +649,11 @@ Note: Mochi's "Feed breakfast" and Biscuit's "Morning walk" are both due 08:00 o
 Entered via a script that calls the same Owner/Pet/Task classes and ai_assistant.answer_question() that app.py's Streamlit UI calls (see the "Exact Commands" section below) rather than by clicking through the browser, since no browser-automation tool was available in this session. Functionally equivalent to entering this data by hand in the "Quick Demo Inputs" / "Tasks" sections of the running app.
 ```
 
-## 6. Live Claude Interaction Evidence Not Performed (By Decision)
+## 6. Live Claude Interaction Evidence — Historical Note (2026-08-01), Superseded by Section 0
 
-Using a real `ANTHROPIC_API_KEY` was a deliberate project decision for this submission, not an oversight or a temporary gap: `ANTHROPIC_API_KEY` was intentionally left unset while collecting this evidence (confirmed at collection time; see Section 7's `missing_api_key` fallback for the same observation captured through the application code path itself). As a result, no real Claude-generated output is claimed anywhere in this document or in `evaluation_results.md`.
+**This section is historical.** At the time this evidence was originally collected (2026-08-01), using a real `ANTHROPIC_API_KEY` was out of scope: `ANTHROPIC_API_KEY` was intentionally left unset while collecting this evidence. That is no longer the case — **Section 0 above (2026-08-04) contains a real, successful live Claude API call** (`success=True`, `fallback_used=False`, `validation_result.valid=True`), plus a separate missing-key fallback test performed without ever touching the real credential. The rest of this section is preserved unedited to show what was verified before live evidence existed.
 
-What was actually verified instead:
+What was verified at the time (2026-08-01), before live evidence existed:
 
 * Claude API orchestration in `ai_assistant.py` (request construction, response parsing, error handling) was exercised using **mocked Anthropic API clients** injected via the `client=` parameter — never a real network call to Anthropic.
 * The real application workflow — intent detection, context retrieval, answer validation, and fallback formatting in `retrieval.py`, `validators.py`, and `ai_assistant.py` — was exercised end-to-end through **deterministic fallback responses**, which do not depend on the Anthropic API being reachable.
@@ -467,9 +664,9 @@ What was actually verified instead:
   * **Validation-failure path** — `test_validation_failure_causes_fallback`, `test_autonomous_action_claim_causes_fallback`, `test_veterinary_language_causes_fallback`, `test_conflict_contradiction_causes_fallback`
   * **Secret-protection path** — `test_api_key_never_appears_in_returned_errors`
 
-**Live model execution was intentionally not performed for this evidence collection — a scope decision, not a limitation to be resolved.** No question, answer, intent, pet, confidence score, or context in this document is presented as coming from a real Claude API response — every fallback interaction recorded in Sections 5, 7, 8, and 9 was produced by the deterministic fallback path, which activates precisely because no live API key was configured. The Claude integration itself is fully implemented in `ai_assistant.py`; only its execution against the live Anthropic API was out of scope for this submission.
+At the time, no question, answer, intent, pet, confidence score, or context in Sections 5, 7, 8, and 9 came from a real Claude API response — every fallback interaction recorded there was produced by the deterministic fallback path, which activates precisely because no live API key was configured then. **This has since changed: see Section 0 for real, live Claude-generated output, obtained with the current source code and a real `ANTHROPIC_API_KEY`.**
 
-## 7. One Deterministic Fallback Interaction
+## 7. One Deterministic Fallback Interaction (historical — 2026-08-01)
 
 One case where `fallback_used=True` (e.g. unknown pet, unsupported question, blank question, or missing API key — see `ai_assistant.py` `FALLBACK_*` reasons).
 
@@ -496,7 +693,7 @@ Fallback reason:     missing_api_key
 
 Captured by calling `ai_assistant.answer_question()` directly with `ANTHROPIC_API_KEY` unset (see Section 5's note on how the sample data was entered), which exercises the exact same code path `app.py` calls when its "Ask PawPal+ AI" button is clicked.
 
-## 8. Retrieved-Context Evidence
+## 8. Retrieved-Context Evidence (historical — 2026-08-01)
 
 Paste at least one raw "Retrieved PawPal+ Context" expander contents (the `context_text` plus the "Records retrieved" / "Detected intent" / "Detected pet" captions shown beneath it), copied directly from the running app, to prove retrieval was actually exercised rather than assumed.
 
@@ -516,7 +713,7 @@ Detected pet: none
 
 Captured for TC-04 ("What is today's schedule?") — see `evaluation_results.md` for the corresponding observed answer, which matches this retrieved context exactly.
 
-## 9. Logging Evidence
+## 9. Logging Evidence (historical — 2026-08-01; a fresh, sanitized log excerpt from the live 2026-08-04 run is in Section 0.9)
 
 Paste a **few relevant, sanitized** lines from `logs/pawpal_ai.log` (or the console output) that correspond to one of the interactions above — e.g. lines showing "Question processing started", "Detected intent", "Retrieval completed", or "Processing completed". Do **not** paste API keys, full prompts, or any other sensitive/private content — trim each line to just what's needed to show the pipeline ran.
 
@@ -532,7 +729,7 @@ Paste a **few relevant, sanitized** lines from `logs/pawpal_ai.log` (or the cons
 
 Taken from `logs/pawpal_ai.log` after running the Section 8 test question (TC-04, "What is today's schedule?" — note the `todays_schedule` intent below matches Section 8, not the incomplete-tasks question in Section 7) (no API keys or full prompt text appear in these log lines — `ai_assistant.py` never logs the prompt or the key, only intent/fallback-reason/status metadata).
 
-## 10. Human Evaluation Summary
+## 10. Human Evaluation Summary (historical — 2026-08-01; superseded by the Live API Evaluation summary in evaluation_results.md)
 
 ```text
 Total cases run:        10 (TC-01 through TC-10, see evaluation_results.md)
